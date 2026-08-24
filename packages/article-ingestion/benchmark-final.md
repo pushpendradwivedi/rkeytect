@@ -1,0 +1,1 @@
+The first real AWS Blog benchmark is ready. It is deliberately mixed AWS/non-AWS and requires evidence-backed relationships. Next milestone is formal automated execution plus image interpretation.
