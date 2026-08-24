@@ -1,0 +1,1 @@
+This branch adds generic architecture components, evidence-backed relationship candidates, and a real AWS Blog benchmark based on Kiro + Bedrock Knowledge Bases + MCP. It intentionally does not add an LLM dependency yet.
