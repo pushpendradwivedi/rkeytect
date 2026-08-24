@@ -1,0 +1,1 @@
+This benchmark is intentionally source-grounded. Do not compare only final diagrams; inspect whether components and edges have evidence and whether inferred/recommended output remains labeled.
