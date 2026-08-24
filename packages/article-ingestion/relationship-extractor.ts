@@ -8,6 +8,7 @@ interface CandidatePattern {
 
 const patterns: CandidatePattern[] = [
   { type: "connects", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+(?:connects|connect)\s+(?:to|with)\s+([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
+  { type: "connects-via", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+(?:connects|connect)\s+([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+to\s+(?:your\s+)?([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
   { type: "calls", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+(?:calls|call)\s+(?:the\s+)?([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
   { type: "sends", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+(?:sends|send)\s+(?:the\s+)?(?:query|request|message|data)\s+to\s+([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
   { type: "searches", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+searches\s+(?:the\s+)?([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
@@ -22,6 +23,22 @@ function resolveComponent(value: string, ir: ArchitectureIR) {
   });
 }
 
+function addRelationship(
+  relationships: Relationship[], evidence: Evidence[], seen: Set<string>, article: ArticleDocument,
+  source: string, target: string, type: string, counter: number, excerpt: string,
+): number {
+  const key = `${source}|${target}|${type}`;
+  if (seen.has(key)) return counter;
+  seen.add(key);
+  const evidenceId = `relationship-evidence-${counter}`;
+  evidence.push({ id: evidenceId, state: "confirmed", confidence: 0.9,
+    source: { url: article.url, title: article.title, excerpt },
+    rationale: `Explicit relationship language matched: ${type}.` });
+  relationships.push({ id: `relationship-${counter}`, source, target, type, level: 1,
+    evidenceIds: [evidenceId], confidence: 0.9 });
+  return counter + 1;
+}
+
 export function extractRelationshipCandidates(article: ArticleDocument, ir: ArchitectureIR): ArchitectureIR {
   const relationships: Relationship[] = [];
   const evidence: Evidence[] = [...ir.evidence];
@@ -30,35 +47,19 @@ export function extractRelationshipCandidates(article: ArticleDocument, ir: Arch
 
   for (const pattern of patterns) {
     for (const match of article.text.matchAll(pattern.regex)) {
+      if (pattern.type === "connects-via") {
+        const source = resolveComponent(match[1], ir);
+        const via = resolveComponent(match[2], ir);
+        const target = resolveComponent(match[3], ir);
+        if (source && via) counter = addRelationship(relationships, evidence, seen, article, source.id, via.id, "connects", counter, match[0]);
+        if (via && target) counter = addRelationship(relationships, evidence, seen, article, via.id, target.id, "connects", counter, match[0]);
+        continue;
+      }
       const source = resolveComponent(match[1], ir);
       const target = resolveComponent(match[2], ir);
       if (!source || !target || source.id === target.id) continue;
-
-      const key = `${source.id}|${target.id}|${pattern.type}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-
-      const evidenceId = `relationship-evidence-${counter}`;
-      evidence.push({
-        id: evidenceId,
-        state: "confirmed",
-        confidence: 0.9,
-        source: { url: article.url, title: article.title, excerpt: match[0] },
-        rationale: `Explicit relationship language matched: ${pattern.type}.`,
-      });
-
-      relationships.push({
-        id: `relationship-${counter}`,
-        source: source.id,
-        target: target.id,
-        type: pattern.type,
-        level: 1,
-        evidenceIds: [evidenceId],
-        confidence: 0.9,
-      });
-      counter += 1;
+      counter = addRelationship(relationships, evidence, seen, article, source.id, target.id, pattern.type, counter, match[0]);
     }
   }
-
   return { ...ir, relationships, evidence };
 }
