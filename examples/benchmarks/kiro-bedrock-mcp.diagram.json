@@ -1,0 +1,22 @@
+{
+  "source": {
+    "url": "https://aws.amazon.com/blogs/devops/scaling-organizational-knowledge-in-kiro-with-amazon-bedrock-knowledge-bases-langchain-and-mcp/",
+    "kind": "diagram"
+  },
+  "regions": [
+    {"id":"r1","label":"Developer / Kiro","confidence":0.99},
+    {"id":"r2","label":"MCP Server","confidence":0.99},
+    {"id":"r3","label":"Amazon Bedrock Knowledge Base","confidence":0.98},
+    {"id":"r4","label":"Amazon OpenSearch Serverless","confidence":0.98}
+  ],
+  "edges": [
+    {"id":"e1","sourceRegionId":"r1","targetRegionId":"r2","label":"MCP request","confidence":0.96},
+    {"id":"e2","sourceRegionId":"r2","targetRegionId":"r3","label":"Retrieve","confidence":0.96},
+    {"id":"e3","sourceRegionId":"r3","targetRegionId":"r4","label":"vector search","confidence":0.93}
+  ],
+  "rules": [
+    "Diagram observations are evidence, not authoritative truth.",
+    "A detected arrow must not become a confirmed Architecture IR relationship until it is linked to evidence and validated.",
+    "Diagram-only observations remain distinguishable from text evidence."
+  ]
+}
