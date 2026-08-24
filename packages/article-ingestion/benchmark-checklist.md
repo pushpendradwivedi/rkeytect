@@ -1,0 +1,7 @@
+- [x] Mixed AWS/non-AWS components
+- [x] Explicit relationship extraction
+- [x] Evidence attached to relationships
+- [x] Benchmark fixture from a real AWS Blog
+- [ ] Image pixel interpretation
+- [ ] LLM-assisted relationship inference
+- [ ] Automated CI benchmark runner
