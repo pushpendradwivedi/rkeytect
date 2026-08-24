@@ -1,0 +1,1 @@
+The supplied Kiro/Bedrock/MCP AWS blog is the first mixed-architecture benchmark. It demonstrates why rkeytect needs generic components, explicit evidence spans, and conservative relationship extraction before any LLM inference is introduced.
