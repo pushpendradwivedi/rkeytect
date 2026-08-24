@@ -1,0 +1,1 @@
+Expected architecture flow for the first benchmark: Developer -> Kiro -> MCP Server -> Bedrock Knowledge Bases Retrieve API; Bedrock query embedding uses Titan Text Embeddings v2 and vector search uses OpenSearch Serverless.
