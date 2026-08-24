@@ -1,0 +1,24 @@
+{
+  "url": "https://aws.amazon.com/blogs/devops/scaling-organizational-knowledge-in-kiro-with-amazon-bedrock-knowledge-bases-langchain-and-mcp/",
+  "expectedLevel1": {
+    "confirmedServices": [
+      "Amazon Bedrock Knowledge Bases",
+      "Amazon S3",
+      "Amazon OpenSearch Serverless",
+      "Amazon Bedrock",
+      "Amazon Titan Text Embeddings v2"
+    ],
+    "confirmedRelationships": [
+      "Kiro -> MCP server",
+      "MCP server -> Amazon Bedrock Knowledge Bases Retrieve API",
+      "Amazon Bedrock Knowledge Bases -> Amazon OpenSearch Serverless",
+      "Amazon Bedrock -> Amazon Titan Text Embeddings v2",
+      "Kiro -> generated response"
+    ]
+  },
+  "notes": [
+    "The blog also describes a LangChain alternative and two possible deployment paths.",
+    "The official architecture diagram is referenced as being in the sample repository, so rkeytect should preserve that as external source evidence rather than silently treating article prose as the complete diagram.",
+    "The current benchmark intentionally distinguishes confirmed source relationships from AI-inferred production recommendations."
+  ]
+}
