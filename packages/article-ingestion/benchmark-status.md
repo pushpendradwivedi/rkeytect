@@ -1,0 +1,1 @@
+Status: first mixed AWS/non-AWS benchmark fixture added. Formal automated execution will be wired once the repository build/test runner is established.
