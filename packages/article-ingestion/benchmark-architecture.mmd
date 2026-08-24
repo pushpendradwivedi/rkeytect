@@ -1,0 +1,6 @@
+flowchart LR
+  Developer --> Kiro
+  Kiro --> MCP[MCP Server]
+  MCP --> Retrieve[Bedrock Knowledge Bases Retrieve API]
+  Bedrock[Amazon Bedrock] --> Titan[Amazon Titan Text Embeddings v2]
+  Bedrock --> OpenSearch[Amazon OpenSearch Serverless]
