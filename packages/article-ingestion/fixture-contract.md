@@ -1,0 +1,1 @@
+A benchmark fixture should define source URL, expected component identities, expected relationship types, and a rule that every confirmed relationship must carry source evidence.
