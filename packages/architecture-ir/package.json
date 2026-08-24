@@ -1,0 +1,7 @@
+{
+  "name": "@rkeytect/architecture-ir",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Machine-readable intermediate representation for evidence-backed cloud architecture.",
+  "license": "MIT"
+}
