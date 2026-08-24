@@ -1,0 +1,31 @@
+{
+  "source": {
+    "title": "Scaling organizational knowledge in Kiro with Amazon Bedrock Knowledge Bases, LangChain, and MCP",
+    "url": "https://aws.amazon.com/blogs/devops/scaling-organizational-knowledge-in-kiro-with-amazon-bedrock-knowledge-bases-langchain-and-mcp/"
+  },
+  "components": [
+    {"id":"developer","name":"Developer","state":"confirmed"},
+    {"id":"kiro","name":"Kiro","state":"confirmed"},
+    {"id":"mcp-server","name":"MCP Server","state":"confirmed"},
+    {"id":"bedrock-kb","name":"Amazon Bedrock Knowledge Bases","state":"confirmed"},
+    {"id":"retrieve-api","name":"Bedrock Retrieve API","state":"confirmed"},
+    {"id":"titan-embeddings","name":"Amazon Titan Text Embeddings v2","state":"confirmed"},
+    {"id":"opensearch-serverless","name":"Amazon OpenSearch Serverless","state":"confirmed"}
+  ],
+  "relationships": [
+    {"source":"developer","target":"kiro","type":"uses","state":"confirmed"},
+    {"source":"kiro","target":"mcp-server","type":"requests","state":"confirmed"},
+    {"source":"mcp-server","target":"retrieve-api","type":"calls","state":"confirmed"},
+    {"source":"retrieve-api","target":"bedrock-kb","type":"queries","state":"confirmed"},
+    {"source":"bedrock-kb","target":"titan-embeddings","type":"embeds","state":"confirmed"},
+    {"source":"bedrock-kb","target":"opensearch-serverless","type":"vector-search","state":"confirmed"},
+    {"source":"retrieve-api","target":"mcp-server","type":"returns-ranked-chunks","state":"confirmed"},
+    {"source":"mcp-server","target":"kiro","type":"returns-context","state":"confirmed"}
+  ],
+  "rules": [
+    "Do not invent an AWS service that is not supported by source evidence.",
+    "Do not label recommendations as source architecture.",
+    "Preserve non-AWS components such as Kiro and MCP Server.",
+    "Every relationship must retain at least one evidence reference before being promoted to confirmed."
+  ]
+}
