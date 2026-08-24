@@ -1,0 +1,3 @@
+Developer -> Kiro -> MCP Server -> Bedrock Knowledge Bases Retrieve API
+Amazon Bedrock -> Amazon Titan Text Embeddings v2
+Amazon Bedrock -> Amazon OpenSearch Serverless
