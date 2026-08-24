@@ -1,0 +1,1 @@
+Run the Kiro benchmark after wiring a test runner. The benchmark should validate component coverage, explicit relationship evidence, and the separation of confirmed source architecture from inferred recommendations.
