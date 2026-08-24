@@ -1,0 +1,5 @@
+{
+  "components": ["Kiro", "MCP Server", "Amazon Bedrock Knowledge Base", "Amazon Bedrock Knowledge Bases Retrieve API", "Amazon Bedrock", "Amazon Titan Text Embeddings v2", "Amazon OpenSearch Serverless"],
+  "relationshipTypes": ["connects", "calls", "embeds", "searches"],
+  "evidenceRequired": true
+}
