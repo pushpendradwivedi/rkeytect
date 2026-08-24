@@ -1,0 +1,1 @@
+Benchmark assets currently live under examples/aws-blogs. The first fixture is Kiro + Bedrock Knowledge Bases + MCP.
