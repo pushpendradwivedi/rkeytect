@@ -1,0 +1,11 @@
+{
+  "source": "https://aws.amazon.com/blogs/devops/scaling-organizational-knowledge-in-kiro-with-amazon-bedrock-knowledge-bases-langchain-and-mcp/",
+  "components": ["Kiro", "MCP Server", "Amazon Bedrock Knowledge Base", "Amazon Bedrock Knowledge Bases Retrieve API", "Amazon Bedrock", "Amazon Titan Text Embeddings v2", "Amazon OpenSearch Serverless"],
+  "relationships": [
+    ["Kiro", "MCP Server", "connects"],
+    ["MCP Server", "Amazon Bedrock Knowledge Base", "connects"],
+    ["MCP Server", "Amazon Bedrock Knowledge Bases Retrieve API", "calls"],
+    ["Amazon Bedrock", "Amazon Titan Text Embeddings v2", "embeds"],
+    ["Amazon Bedrock", "Amazon OpenSearch Serverless", "searches"]
+  ]
+}
