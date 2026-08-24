@@ -1,0 +1,1 @@
+AWS DevOps Blog benchmark source: Scaling organizational knowledge in Kiro with Amazon Bedrock Knowledge Bases, LangChain, and MCP. The article's explicit flow includes Kiro -> MCP server -> Bedrock Knowledge Bases Retrieve API; Bedrock uses Titan Text Embeddings v2 and searches OpenSearch Serverless.
