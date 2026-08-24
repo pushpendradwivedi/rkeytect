@@ -1,6 +1,5 @@
 import { ArticleDocument } from "./index";
 import { ArchitectureIR, Evidence, Relationship } from "../architecture-ir";
-import { awsServices } from "../aws-catalog";
 
 interface CandidatePattern {
   type: string;
@@ -11,26 +10,33 @@ const patterns: CandidatePattern[] = [
   { type: "connects", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+(?:connects|connect)\s+(?:to|with)\s+([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
   { type: "calls", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+(?:calls|call)\s+(?:the\s+)?([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
   { type: "sends", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+(?:sends|send)\s+(?:the\s+)?(?:query|request|message|data)\s+to\s+([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
-  { type: "searches", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+searches\s+the\s+([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
+  { type: "searches", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+searches\s+(?:the\s+)?([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
+  { type: "embeds", regex: /([A-Za-z][A-Za-z0-9 ._-]{2,80})\s+embeds\s+(?:your\s+)?query\s+using\s+([A-Za-z][A-Za-z0-9 ._-]{2,80})/gi },
 ];
 
-function resolveService(value: string) {
+function resolveComponent(value: string, ir: ArchitectureIR) {
   const normalized = value.toLowerCase();
-  return awsServices.find((service) =>
-    service.aliases.some((alias) => normalized.includes(alias.toLowerCase())),
-  );
+  return ir.components.find((component) => {
+    const candidates = [component.name, component.service, component.id].filter(Boolean) as string[];
+    return candidates.some((candidate) => normalized.includes(candidate.toLowerCase()));
+  });
 }
 
 export function extractRelationshipCandidates(article: ArticleDocument, ir: ArchitectureIR): ArchitectureIR {
   const relationships: Relationship[] = [];
   const evidence: Evidence[] = [...ir.evidence];
+  const seen = new Set<string>();
   let counter = 0;
 
   for (const pattern of patterns) {
     for (const match of article.text.matchAll(pattern.regex)) {
-      const source = resolveService(match[1]);
-      const target = resolveService(match[2]);
+      const source = resolveComponent(match[1], ir);
+      const target = resolveComponent(match[2], ir);
       if (!source || !target || source.id === target.id) continue;
+
+      const key = `${source.id}|${target.id}|${pattern.type}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
 
       const evidenceId = `relationship-evidence-${counter}`;
       evidence.push({
