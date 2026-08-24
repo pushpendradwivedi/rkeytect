@@ -1,0 +1,1 @@
+Ready for review: article ingestion + generic component extraction + evidence-backed relationship extraction + Kiro benchmark fixture.
