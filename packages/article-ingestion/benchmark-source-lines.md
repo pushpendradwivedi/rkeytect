@@ -1,0 +1,1 @@
+The AWS article's How it works section is the canonical source for this benchmark. It explicitly enumerates the Kiro -> MCP -> Retrieve API -> vector search -> ranked chunks -> Kiro response sequence.
