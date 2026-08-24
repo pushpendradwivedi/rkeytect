@@ -1,0 +1,1 @@
+Relationship extraction is intentionally conservative. It uses explicit verbs such as connects, calls, sends, searches, and embeds, then resolves both sides against the Architecture IR. It attaches the exact matched sentence fragment as evidence. Future LLM extraction must use the same IR/evidence contract rather than bypassing validation.
