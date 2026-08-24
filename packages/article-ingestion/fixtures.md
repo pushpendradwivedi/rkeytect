@@ -1,0 +1,1 @@
+Current fixture: Kiro / Amazon Bedrock Knowledge Bases / MCP. Source URL is recorded in examples/aws-blogs/kiro-bedrock-mcp.json.
