@@ -4,6 +4,7 @@ import { useState } from "react";
 import { geminiKey } from "../lib/provider-key";
 import { validateAwsBlogUrl } from "../lib/url-validation";
 import { ingestArticle } from "../lib/article-client";
+import { analyzeArticle } from "../lib/analysis";
 import { ApiKeyPrivacyNotice } from "./ApiKeyPrivacyNotice";
 
 export function AnalyzePanel() {
@@ -24,11 +25,15 @@ export function AnalyzePanel() {
       setBusy(true);
       setStatus("Fetching AWS Blog content…");
       const article = await ingestArticle(url);
-      setStatus(`Found ${article.images.length} image candidates. Preparing architecture analysis…`);
-      // Gemini vision is intentionally invoked only from the browser and will be wired
-      // to the ranked image candidates in the next pipeline step.
+      setStatus(`Found ${article.images.length} image candidates. Asking Gemini to inspect the architecture diagram…`);
+      const result = await analyzeArticle(article);
+      if (result.diagram) {
+        setStatus(`Architecture observation complete: ${result.diagram.regions.length} regions and ${result.diagram.edges.length} candidate edges. Review before treating anything as confirmed.`);
+      } else {
+        setStatus("No architecture image candidate was found. Article-only analysis is not implemented yet.");
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to start analysis.");
+      setError(err instanceof Error ? err.message : "Unable to analyze architecture.");
     } finally {
       setBusy(false);
     }
