@@ -57,10 +57,12 @@ export function fuseEvidence(input: FusionInput): ArchitectureIR {
   const evidence: Evidence[] = [];
   const components = new Map<string, Component>();
   const relationships = new Map<string, Relationship>();
+  const diagram = input.diagram;
+  const hasSourceDiagram = diagram?.sourceMode === "diagram";
 
   // Source relevance is a hard gate. If vision/article analysis says the page is
   // not architectural, do not manufacture an architecture from incidental mentions.
-  if (input.diagram?.isArchitectureRelevant === false) {
+  if (diagram?.isArchitectureRelevant === false) {
     return {
       schemaVersion: "0.1",
       title: input.source.title ?? "rkeytect architecture",
@@ -74,7 +76,7 @@ export function fuseEvidence(input: FusionInput): ArchitectureIR {
   // Text is supporting evidence, not an entity extractor. A service mention alone
   // is deliberately insufficient to become an architecture component.
   // When a source diagram exists, the diagram is the primary component authority.
-  if (!input.diagram || input.diagram.sourceMode !== "diagram") {
+  if (!hasSourceDiagram) {
     for (const item of input.textEvidence) {
       if (!isArchitectureSentence(item.text)) continue;
       const matchingServices = awsServices.filter((service) =>
@@ -97,8 +99,8 @@ export function fuseEvidence(input: FusionInput): ArchitectureIR {
     }
   }
 
-  if (input.diagram?.isArchitectureRelevant !== false) {
-    for (const region of input.diagram?.regions ?? []) {
+  if (hasSourceDiagram && diagram) {
+    for (const region of diagram.regions) {
       if (!region.label) continue;
       const service = findService(region.label);
       const id = service?.id ?? `diagram-${region.id}`;
@@ -107,7 +109,7 @@ export function fuseEvidence(input: FusionInput): ArchitectureIR {
         id: evidenceId,
         state: "confirmed",
         confidence: region.confidence,
-        source: { url: input.diagram.imageUrl || input.source.url, location: `diagram:region:${region.id}` },
+        source: { url: diagram.imageUrl || input.source.url, location: `diagram:region:${region.id}` },
         rationale: "Component is visibly represented in the source architecture diagram.",
       });
       addComponent(
@@ -121,9 +123,9 @@ export function fuseEvidence(input: FusionInput): ArchitectureIR {
       );
     }
 
-    for (const edge of input.diagram?.edges ?? []) {
-      const sourceRegion = input.diagram?.regions.find((region) => region.id === edge.sourceRegionId);
-      const targetRegion = input.diagram?.regions.find((region) => region.id === edge.targetRegionId);
+    for (const edge of diagram.edges) {
+      const sourceRegion = diagram.regions.find((region) => region.id === edge.sourceRegionId);
+      const targetRegion = diagram.regions.find((region) => region.id === edge.targetRegionId);
       if (!sourceRegion?.label || !targetRegion?.label) continue;
 
       const sourceService = findService(sourceRegion.label);
@@ -137,7 +139,7 @@ export function fuseEvidence(input: FusionInput): ArchitectureIR {
         id: evidenceId,
         state: "confirmed",
         confidence: edge.confidence,
-        source: { url: input.diagram.imageUrl || input.source.url, location: `diagram:edge:${edge.id}` },
+        source: { url: diagram.imageUrl || input.source.url, location: `diagram:edge:${edge.id}` },
         rationale: "Relationship is visibly represented by a connector in the source architecture diagram.",
       });
       relationships.set(edge.id, {
