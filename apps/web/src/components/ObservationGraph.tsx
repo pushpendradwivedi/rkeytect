@@ -111,7 +111,7 @@ export function ObservationGraph({ observation }: { observation: DiagramObservat
               <rect x={pos.x} y={pos.y} width="5" height={positions.cardH} rx="3" fill="#ff9900" />
               {icon ? <image href={icon} x={pos.x + 17} y={pos.y + 21} width="44" height="44" preserveAspectRatio="xMidYMid meet" /> : <rect x={pos.x + 17} y={pos.y + 21} width="44" height="44" rx="12" fill="#eef2f7" />}
               {!icon && <text x={pos.x + 39} y={pos.y + 49} textAnchor="middle" fontSize="17" fontWeight="800" fill="#475467">{(region.label ?? "?").slice(0, 1).toUpperCase()}</text>}
-              <text x={pos.x + 74} y={pos.y + 25} fontSize="9" fontWeight="700" fill="#98a2b3" textTransform="uppercase">{kind}</text>
+              <text x={pos.x + 74} y={pos.y + 25} fontSize="9" fontWeight="700" fill="#98a2b3">{kind.toUpperCase()}</text>
               {lines.map((line, index) => <text key={line} x={pos.x + 74} y={pos.y + 49 + index * 17} fontSize="13" fontWeight="750" fill="#101828">{line}</text>)}
               <text x={pos.x + 74} y={pos.y + 93} fontSize="9.5" fill="#667085">AI observation · {Math.round(region.confidence * 100)}%</text>
             </g>;
