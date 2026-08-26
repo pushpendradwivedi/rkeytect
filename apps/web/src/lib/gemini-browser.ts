@@ -108,12 +108,32 @@ export async function analyzeDiagramWithGemini(apiKey: string, imageUrl: string,
     ].join("\n") },
     { inline_data: { mime_type: image.mime, data: image.data } },
   ], diagramSchema, model);
-  const observation = normalizeObservation(parsed, imageUrl);
-  // An image analysis pass is always diagram-mode. Never fall back to prose
-  // entity extraction after a real source diagram has been selected.
+
+  // Second-pass visual audit. This deliberately has no article text and receives
+  // the candidate extraction plus the original image, so incidental prose/model
+  // knowledge cannot promote a service into the architecture.
+  const audited = await callGemini(apiKey, [
+    { text: [
+      "You are the visual evidence auditor for rkeytect.",
+      "The JSON below is an UNTRUSTED candidate extraction from an architecture image.",
+      "Compare every candidate component against the actual pixels in the supplied image.",
+      "REMOVE any component that is not visibly represented or clearly labeled in the image.",
+      "REMOVE any relationship unless its connector/arrow is visibly supported by the image.",
+      "Do not add new components or relationships during this audit.",
+      "In particular, do not preserve model guesses such as alternative LLMs, local tools, or services merely because they are common or mentioned elsewhere.",
+      "If the image is not an architecture diagram, return an empty architecture and isArchitectureRelevant=false.",
+      "Keep sourceMode=diagram when the image is a valid architecture diagram.",
+      "CANDIDATE JSON:",
+      JSON.stringify(parsed),
+    ].join("\n") },
+    { inline_data: { mime_type: image.mime, data: image.data } },
+  ], diagramSchema, model);
+
+  const observation = normalizeObservation(audited, imageUrl);
   return {
     ...observation,
     sourceMode: observation.isArchitectureRelevant ? "diagram" : "none",
+    warnings: ["Architecture extraction was independently audited against the source image.", ...observation.warnings],
   };
 }
 
