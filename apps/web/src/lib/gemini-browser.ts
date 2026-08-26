@@ -103,11 +103,18 @@ export async function analyzeDiagramWithGemini(apiKey: string, imageUrl: string,
       "Never invent a service because it is likely to exist.",
       "Do not treat decorative shapes, AWS navigation artwork, screenshots, logos, or people as architecture components.",
       "Use canonical AWS service names when the icon/label makes the service identifiable.",
+      "Do not add components because they are merely mentioned in an article. This image is the source of truth for this extraction pass.",
       "Confidence means confidence in the observation, not confidence that the architecture is correct.",
     ].join("\n") },
     { inline_data: { mime_type: image.mime, data: image.data } },
   ], diagramSchema, model);
-  return normalizeObservation(parsed, imageUrl);
+  const observation = normalizeObservation(parsed, imageUrl);
+  // An image analysis pass is always diagram-mode. Never fall back to prose
+  // entity extraction after a real source diagram has been selected.
+  return {
+    ...observation,
+    sourceMode: observation.isArchitectureRelevant ? "diagram" : "none",
+  };
 }
 
 export async function analyzeArticleWithGemini(apiKey: string, articleText: string, sourceTitle: string, model = DEFAULT_MODEL): Promise<DiagramObservation> {
