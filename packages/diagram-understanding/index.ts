@@ -2,6 +2,7 @@ export interface DiagramRegion {
   id: string;
   label: string;
   confidence: number;
+  kind?: string;
 }
 
 export interface DiagramEdge {
@@ -18,6 +19,11 @@ export interface DiagramObservation {
   regions: DiagramRegion[];
   edges: DiagramEdge[];
   warnings: string[];
+  isArchitectureRelevant?: boolean;
+  architectureConfidence?: number;
+  assessmentReason?: string;
+  sourceMode?: "diagram" | "prose" | "none";
+  sourceEvidence?: string[];
 }
 
 export function isDiagramObservation(value: unknown): value is DiagramObservation {
