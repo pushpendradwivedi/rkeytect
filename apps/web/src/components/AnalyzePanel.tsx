@@ -7,6 +7,7 @@ import { ingestArticle } from "../lib/article-client";
 import { analyzeArticle } from "../lib/analysis";
 import { ApiKeyPrivacyNotice } from "./ApiKeyPrivacyNotice";
 import { ArchitectureObservation } from "./ArchitectureObservation";
+import { ObservationGraph } from "./ObservationGraph";
 
 export function AnalyzePanel() {
   const [url, setUrl] = useState("");
@@ -17,34 +18,21 @@ export function AnalyzePanel() {
   const [observation, setObservation] = useState<Awaited<ReturnType<typeof analyzeArticle>>["diagram"]>();
 
   async function continueAnalysis() {
-    setError(null);
-    setStatus(null);
-    setObservation(undefined);
+    setError(null); setStatus(null); setObservation(undefined);
     try {
       validateAwsBlogUrl(url);
       if (!apiKey.trim()) throw new Error("Enter your Gemini API key to continue.");
-      geminiKey.set(apiKey);
-      setApiKey("");
-      setBusy(true);
-      setStatus("Fetching AWS Blog content…");
+      geminiKey.set(apiKey); setApiKey(""); setBusy(true); setStatus("Fetching AWS Blog content…");
       const article = await ingestArticle(url);
       setStatus(`Found ${article.images.length} candidate images. Selecting only likely architecture diagrams…`);
-      const result = await analyzeArticle(article);
-      setObservation(result.diagram);
-      if (result.diagram) {
-        setStatus(result.mode === "diagram"
-          ? `Architecture diagram analyzed: ${result.diagram.regions.length} components and ${result.diagram.edges.length} candidate edges.`
-          : `Architecture reconstructed from article prose: ${result.diagram.regions.length} components and ${result.diagram.edges.length} candidate edges.`);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to analyze architecture.");
-    } finally {
-      setBusy(false);
-    }
+      const result = await analyzeArticle(article); setObservation(result.diagram);
+      if (result.diagram) setStatus(result.mode === "diagram" ? `Architecture diagram analyzed: ${result.diagram.regions.length} components and ${result.diagram.edges.length} candidate edges.` : `Architecture reconstructed from article prose: ${result.diagram.regions.length} components and ${result.diagram.edges.length} candidate edges.`);
+    } catch (err) { setError(err instanceof Error ? err.message : "Unable to analyze architecture."); }
+    finally { setBusy(false); }
   }
 
   return (
-    <section className="mx-auto w-full max-w-5xl space-y-4">
+    <section className="mx-auto w-full max-w-7xl space-y-4">
       <div className="rounded-2xl border bg-white p-5 shadow-sm">
         <label className="text-sm font-semibold" htmlFor="aws-url">AWS Blog URL</label>
         <input id="aws-url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://aws.amazon.com/blogs/..." className="mt-2 w-full rounded-xl border px-4 py-3 outline-none focus:ring-2" />
@@ -53,11 +41,9 @@ export function AnalyzePanel() {
         <div className="mt-4"><ApiKeyPrivacyNotice /></div>
         {status && <p className="mt-3 text-sm opacity-80" role="status">{status}</p>}
         {error && <p className="mt-3 text-sm font-medium" role="alert">{error}</p>}
-        <button type="button" disabled={busy} onClick={continueAnalysis} className="mt-5 w-full rounded-xl border px-4 py-3 font-semibold disabled:opacity-50">
-          {busy ? "Analyzing…" : "Analyze architecture"}
-        </button>
+        <button type="button" disabled={busy} onClick={continueAnalysis} className="mt-5 w-full rounded-xl border px-4 py-3 font-semibold disabled:opacity-50">{busy ? "Analyzing…" : "Analyze architecture"}</button>
       </div>
-      {observation && <ArchitectureObservation observation={observation} />}
+      {observation && <><ObservationGraph observation={observation} /><ArchitectureObservation observation={observation} /></>}
       <p className="text-center text-xs opacity-60">AI-generated output is not authoritative AWS guidance. Verify against the original source and official AWS documentation before production use.</p>
     </section>
   );
