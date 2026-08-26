@@ -1,5 +1,5 @@
 import type { ArticlePayload } from "./article-client";
-import type { TextEvidence } from "../../../packages/evidence-fusion";
+import type { TextEvidence } from "../../../../packages/evidence-fusion";
 
 export function buildTextEvidence(article: ArticlePayload): TextEvidence[] {
   const chunks = article.text
