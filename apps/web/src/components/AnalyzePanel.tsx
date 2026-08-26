@@ -6,6 +6,7 @@ import { validateAwsBlogUrl } from "../lib/url-validation";
 import { ingestArticle } from "../lib/article-client";
 import { analyzeArticle } from "../lib/analysis";
 import { ApiKeyPrivacyNotice } from "./ApiKeyPrivacyNotice";
+import { ArchitectureObservation } from "./ArchitectureObservation";
 
 export function AnalyzePanel() {
   const [url, setUrl] = useState("");
@@ -13,10 +14,12 @@ export function AnalyzePanel() {
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [observation, setObservation] = useState<Awaited<ReturnType<typeof analyzeArticle>>["diagram"]>();
 
   async function continueAnalysis() {
     setError(null);
     setStatus(null);
+    setObservation(undefined);
     try {
       validateAwsBlogUrl(url);
       if (!apiKey.trim()) throw new Error("Enter your Gemini API key to continue.");
@@ -27,8 +30,9 @@ export function AnalyzePanel() {
       const article = await ingestArticle(url);
       setStatus(`Found ${article.images.length} image candidates. Asking Gemini to inspect the architecture diagram…`);
       const result = await analyzeArticle(article);
+      setObservation(result.diagram);
       if (result.diagram) {
-        setStatus(`Architecture observation complete: ${result.diagram.regions.length} regions and ${result.diagram.edges.length} candidate edges. Review before treating anything as confirmed.`);
+        setStatus(`Architecture observation complete: ${result.diagram.regions.length} regions and ${result.diagram.edges.length} candidate edges.`);
       } else {
         setStatus("No architecture image candidate was found. Article-only analysis is not implemented yet.");
       }
@@ -40,7 +44,7 @@ export function AnalyzePanel() {
   }
 
   return (
-    <section className="mx-auto w-full max-w-3xl space-y-4">
+    <section className="mx-auto w-full max-w-5xl space-y-4">
       <div className="rounded-2xl border bg-white p-5 shadow-sm">
         <label className="text-sm font-semibold" htmlFor="aws-url">AWS Blog URL</label>
         <input id="aws-url" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://aws.amazon.com/blogs/..." className="mt-2 w-full rounded-xl border px-4 py-3 outline-none focus:ring-2" />
@@ -53,6 +57,7 @@ export function AnalyzePanel() {
           {busy ? "Analyzing…" : "Analyze architecture"}
         </button>
       </div>
+      {observation && <ArchitectureObservation observation={observation} />}
       <p className="text-center text-xs opacity-60">AI-generated output is not authoritative AWS guidance. Verify against the original source and official AWS documentation before production use.</p>
     </section>
   );
