@@ -28,13 +28,13 @@ export function AnalyzePanel() {
       setBusy(true);
       setStatus("Fetching AWS Blog content…");
       const article = await ingestArticle(url);
-      setStatus(`Found ${article.images.length} image candidates. Asking Gemini to inspect the architecture diagram…`);
+      setStatus(`Found ${article.images.length} candidate images. Selecting only likely architecture diagrams…`);
       const result = await analyzeArticle(article);
       setObservation(result.diagram);
       if (result.diagram) {
-        setStatus(`Architecture observation complete: ${result.diagram.regions.length} regions and ${result.diagram.edges.length} candidate edges.`);
-      } else {
-        setStatus("No architecture image candidate was found. Article-only analysis is not implemented yet.");
+        setStatus(result.mode === "diagram"
+          ? `Architecture diagram analyzed: ${result.diagram.regions.length} components and ${result.diagram.edges.length} candidate edges.`
+          : `Architecture reconstructed from article prose: ${result.diagram.regions.length} components and ${result.diagram.edges.length} candidate edges.`);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to analyze architecture.");
