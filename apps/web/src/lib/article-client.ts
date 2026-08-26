@@ -3,7 +3,7 @@ import { rankArchitectureImages } from "./article-image";
 export interface ArticlePayload {
   source: { url: string; title: string; description: string };
   text: string;
-  images: Array<{ url: string; alt?: string }>;
+  images: Array<{ url: string; alt?: string; score: number }>;
   aiCredentialReceived: false;
 }
 
@@ -20,8 +20,5 @@ export async function ingestArticle(url: string): Promise<ArticlePayload> {
   }
 
   const payload = (await response.json()) as ArticlePayload;
-  return {
-    ...payload,
-    images: rankArchitectureImages(payload.images.map((image) => ({ ...image, score: 0 }))),
-  };
+  return { ...payload, images: rankArchitectureImages(payload.images) };
 }
