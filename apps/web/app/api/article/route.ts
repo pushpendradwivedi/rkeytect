@@ -9,9 +9,7 @@ function validAwsBlogUrl(value: string): URL | null {
     if (!AWS_HOSTS.has(url.hostname.toLowerCase())) return null;
     if (!url.pathname.startsWith("/blogs/")) return null;
     return url;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 function decodeEntities(value: string): string {
@@ -23,16 +21,25 @@ function stripHtml(html: string): string {
 }
 
 function extractImages(html: string, pageUrl: string) {
-  const images: Array<{ url: string; alt?: string }> = [];
+  const images: Array<{ url: string; alt?: string; score: number }> = [];
+  const blocked = /global-nav|re:invent-register|logo|avatar|author|social|icon|pixel|tracking/i;
+  const positive = /architecture|architecture[-_ ]?diagram|solution architecture|workflow|data flow|figure|how it works|end[-_ ]to[-_ ]end/i;
+
   for (const match of html.matchAll(/<img\b[^>]*>/gi)) {
     const tag = match[0];
     const src = tag.match(/\bsrc=["']([^"']+)["']/i)?.[1];
     if (!src) continue;
     try {
-      images.push({ url: new URL(src, pageUrl).toString(), alt: tag.match(/\balt=["']([^"']*)["']/i)?.[1] });
+      const url = new URL(src, pageUrl).toString();
+      const alt = tag.match(/\balt=["']([^"']*)["']/i)?.[1] ?? "";
+      const context = `${url} ${alt}`;
+      if (blocked.test(context)) continue;
+      let score = positive.test(context) ? 30 : 0;
+      if (/figure\s*[1-9]|architecture/i.test(alt)) score += 30;
+      images.push({ url, alt, score });
     } catch {}
   }
-  return images;
+  return images.sort((a, b) => b.score - a.score);
 }
 
 export async function POST(request: NextRequest) {
