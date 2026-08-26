@@ -1,8 +1,8 @@
-import { fuseEvidence, type FusionInput } from "../../../packages/evidence-fusion";
-import { validate } from "../../../packages/architecture-core";
+import { fuseEvidence, type FusionInput } from "../../../../packages/evidence-fusion";
+import { validate } from "../../../../packages/architecture-core";
 import { buildTextEvidence } from "./text-evidence";
 import type { ArticlePayload } from "./article-client";
-import type { DiagramObservation } from "../../../packages/diagram-understanding";
+import type { DiagramObservation } from "../../../../packages/diagram-understanding";
 
 export function buildArchitectureIR(article: ArticlePayload, diagram?: DiagramObservation) {
   const input: FusionInput = {
